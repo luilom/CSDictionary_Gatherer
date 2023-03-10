@@ -1,7 +1,7 @@
 import wikipediaapi
 import re
 import requests
-
+import sys
 dict = {}
 
 def print_categorymembers(categorymembers, level=0, max_level=20):
@@ -10,13 +10,16 @@ def print_categorymembers(categorymembers, level=0, max_level=20):
             name = re.sub(r'\(([^\)]+)\)', '', c.title)
             if dict.get(name) == None:
                 # Primary Key (name)
+                print("name")
                 print(name)
                 # Definition
                 definition = c.summary.replace('== References ==', '')
+                print("Definition")
                 print(definition)
                 dict[name] = definition
                 # Page URL
                 url = c.fullurl
+                print("url")
                 print(url)
 
                 try:
@@ -33,12 +36,34 @@ def print_categorymembers(categorymembers, level=0, max_level=20):
                             # Alternative name
                             print(redirects['title'])
                 except:
-                    print('There are no redirects')
+                    #print('There are no redirects')
+                    print('')
 
         if c.ns == wikipediaapi.Namespace.CATEGORY and level < max_level:
             print_categorymembers(c.categorymembers, level=level + 1, max_level=max_level)
 
-wikipedia = wikipediaapi.Wikipedia('en')
+
+def get_contents(categorymembers, level=0, max_level=1):
+    for c in categorymembers.values():
+        if not regex.search(c.title):
+            name = re.sub(r'\(([^\)]+)\)', '', c.title)
+            if dict.get(name) == None:
+                definition = c.summary.replace('== References ==', '')
+                dict[name] = definition
+
+        if c.ns == wikipediaapi.Namespace.CATEGORY and level < max_level:
+            print_categorymembers(c.categorymembers, level=level + 1, max_level=max_level)
+
+
+
+
+
+categories = ['Ideologie politiche','Sessualità','Religione', 'Salute', 'Sociologia economica']
+
+wikipedia = wikipediaapi.Wikipedia('it')
 regex = re.compile(r'Category|[cC]omparison|List of|Outline of|Template:|Glossary of|Portal:')
-category = wikipedia.page("Category:Computing")
-print_categorymembers(category.categorymembers)
+category = wikipedia.page("Category:"+categories[0])
+
+get_contents(category.categorymembers)
+
+print(dict)
